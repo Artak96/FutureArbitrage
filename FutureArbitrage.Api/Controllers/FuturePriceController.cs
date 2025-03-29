@@ -1,17 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FutureArbitrage.Api.Controllers
 {
     [ApiController]
-    [Route("api/prices")]
+    [Route("[controller]")]
     public class FuturePriceController : ControllerBase
     {
-        //private readonly IMediator _mediator;
+        private readonly IMediator _mediator;
 
         [HttpGet]
         public async Task<IActionResult> GetAllPrices()
         {
-            //var prices = await _repository.GetAllAsync();
+
+
             return Ok();
         }
     }

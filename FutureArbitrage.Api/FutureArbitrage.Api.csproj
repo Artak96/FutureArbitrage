@@ -8,16 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Binance.Net" Version="10.19.0" />
+    <PackageReference Include="CryptoExchange.Net" Version="8.8.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.14">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
     <PackageReference Include="Serilog" Version="4.2.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FutureArbitrage.Application\FutureArbitrage.Application.csproj" />
     <ProjectReference Include="..\FutureArbitrage.Infrastructure\FutureArbitrage.Infrastructure.csproj" />
   </ItemGroup>
 

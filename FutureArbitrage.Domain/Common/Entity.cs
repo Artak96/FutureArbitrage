@@ -1,4 +1,6 @@
-﻿namespace FutureArbitrage.Domain.Common
+﻿using System.Security.Cryptography;
+
+namespace FutureArbitrage.Domain.Common
 {
     public class Entity
     {

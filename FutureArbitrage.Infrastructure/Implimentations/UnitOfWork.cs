@@ -19,6 +19,12 @@ namespace FutureArbitrage.Infrastructure.Implimentations
         private FuturePriceRepository _futurePrice;
         public IFuturePriceRepository FuturePrice => _futurePrice ?? new FuturePriceRepository(_dbContext);
 
+        private FutureContractRepository _futureContract;
+        public IFutureContractRepository FutureContract => _futureContract ?? new FutureContractRepository(_dbContext);
+
+        private ArbitrageResultRepository _arbitrageResultRepository;
+        public IArbitrageResultRepository ArbitrageResult => _arbitrageResultRepository ?? new ArbitrageResultRepository(_dbContext);
+
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             if (!_dbContext.ChangeTracker.HasChanges())

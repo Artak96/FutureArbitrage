@@ -4,19 +4,20 @@ namespace FutureArbitrage.Domain.Entities
 {
     public class FuturePrice : Entity
     {
-        public Guid Id { get; private set; }
-        public string Symbol { get; private set; }
-        public decimal Price { get; private set; }
+        public long Id { get; set; }
+        public DateTime Timestamp { get; set; } // Временная метка
+        public decimal Price { get; set; } // Цена закрытия
 
-        public FuturePrice()
-        {
-            
-        }
+        public long FutureContractId { get; set; } 
+        public virtual FutureContract FuturesContract { get; set; }
 
-        public FuturePrice(string symbol, decimal price)
+        public FuturePrice() { }
+
+        public FuturePrice(DateTime timestamp, decimal price, long futureContractId)
         {
-            Symbol = symbol;
+            Timestamp = timestamp;
             Price = price;
+            FutureContractId = futureContractId;
         }
     }
 }

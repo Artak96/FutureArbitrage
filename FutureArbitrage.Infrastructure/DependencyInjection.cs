@@ -1,4 +1,11 @@
-﻿using FutureArbitrage.Infrastructure.Data.Context;
+﻿using FutureArbitrage.Application.Services.Abstructions;
+using FutureArbitrage.Domain.Abstractions;
+using FutureArbitrage.Domain.Abstractions.IRepositories;
+using FutureArbitrage.Domain.Common;
+using FutureArbitrage.Infrastructure.Data.Context;
+using FutureArbitrage.Infrastructure.Implimentations;
+using FutureArbitrage.Infrastructure.Implimentations.Repositories;
+using FutureArbitrage.Infrastructure.Services.Implimentations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,8 +16,15 @@ namespace FutureArbitrage.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddScoped<IBaseRepository, BaseRepository>();
-            //services.AddScoped<IUnitOfWork, UnitOfWOrk>();
+            // Registr Repositories
+            services.AddScoped<IBaseRepository<Entity>, BaseRepository<Entity>>();
+            services.AddScoped<IArbitrageResultRepository, ArbitrageResultRepository>();
+            services.AddScoped<IFutureContractRepository, FutureContractRepository>();
+            services.AddScoped<IFuturePriceRepository, FuturePriceRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWOrk>();
+
+            // Registr Services
+            services.AddScoped<IBinancePriceService, BinancePriceService>();
 
             string connectionString = configuration.GetConnectionString("ConnectionString")!;
             services.AddDbContext<FutureArbitrageDbContext>(options =>

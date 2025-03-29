@@ -2,16 +2,21 @@
 using FluentValidation.AspNetCore;
 using MediatR.NotificationPublishers;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Reflection.Metadata;
+using Microsoft.Extensions.DependencyInjection;
+using FutureArbitrage.Application.Services.Abstructions;
+using FutureArbitrage.Application.Services.Implimentations;
+
 
 namespace FutureArbitrage.Application
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+            services.AddScoped<IArbitrageCalculatorService, ArbitrageCalculatorService>();
+
             services.AddMediatR();
             services.AddValidation();
             return services;

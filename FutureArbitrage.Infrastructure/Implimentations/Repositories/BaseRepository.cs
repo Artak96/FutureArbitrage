@@ -13,9 +13,9 @@ namespace FutureArbitrage.Infrastructure.Implimentations.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task AddAsync(T entity)
+        public async Task AddAsync(T entity, CancellationToken cancellationToken)
         {
-            await _context.AddAsync(entity);
+            await _context.AddAsync(entity, cancellationToken);
         }
     }
 }

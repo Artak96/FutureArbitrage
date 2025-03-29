@@ -8,19 +8,14 @@ namespace FutureArbitrage.Infrastructure.Data.Configuration
     {
         public void Configure(EntityTypeBuilder<FuturePrice> builder)
         {
-            builder.ToTable("FuturePrices");
+            builder.HasKey(fp => fp.Id); // Set Id as primary key
+            builder.Property(fp => fp.Id); // Auto-generate GUID
+            builder.Property(fp => fp.Timestamp).IsRequired(); // Timestamp is required
+            builder.Property(fp => fp.Price).HasColumnType("decimal(18, 2)").IsRequired(); // Price as decimal
 
-            builder.HasKey(e => e.Id);
-
-            builder.Property(e => e.Id)
-                .ValueGeneratedNever();
-
-            builder.Property(e => e.Symbol)
-                .IsRequired()
-                .HasMaxLength(50); 
-
-            builder.Property(e => e.Price)
-                .HasColumnType("decimal(18,4)");
+            builder.HasOne(fp => fp.FuturesContract)
+                .WithMany(fc => fc.FuturesPrices)
+                .HasForeignKey(fp => fp.FutureContractId);
 
             builder.Property(g => g.CreatedDate)
                 .IsRequired(true)
