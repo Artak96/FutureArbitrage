@@ -1,57 +1,99 @@
-﻿using FutureArbitrage.Application.Services.Abstructions;
+﻿using FutureArbitrage.Application.Dtos;
+using FutureArbitrage.Application.Services.Abstructions;
+using FutureArbitrage.Domain.Abstractions;
 using FutureArbitrage.Domain.Entities;
+using Serilog;
+using System.Globalization;
 
 namespace FutureArbitrage.Application.Services.Implimentations
 {
     public class ArbitrageCalculatorService : IArbitrageCalculatorService
     {
+        protected internal readonly ILogger _logger = Log.ForContext(typeof(ArbitrageCalculatorService));
         private readonly IBinancePriceService _binanceService;
-        private readonly List<ArbitrageResult> _results = new();
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ArbitrageCalculatorService(IBinancePriceService binanceService)
+        public ArbitrageCalculatorService(IBinancePriceService binanceService, IUnitOfWork unitOfWork)
         {
             _binanceService = binanceService;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<ArbitrageResult>> CalculateArbitrage(TimeSpan interval, DateTime startTime, DateTime endTime)
+        public async Task CalculateArbitrage(ArbitrageCalculatorDto arbitrageCalculatorDto, CancellationToken cancellation)
         {
-            var (futures1Symbol, futures2Symbol) = await _binanceService.GetLatestQuarterlyContracts();
-            DateTime currentTime = startTime;
+
+            _logger.Information($"Start => {nameof(ArbitrageCalculatorService)}");
+
+            var futureContracts = await _binanceService.GetLatestQuarterlyContracts(arbitrageCalculatorDto.ContractType);
+            DateTime currentTime = arbitrageCalculatorDto.StartTime;
             decimal lastPrice1 = 0m;
             decimal lastPrice2 = 0m;
 
-            while (currentTime <= endTime)
+            for (int i = 0; i < 2; i++)
+            {
+                var contract = await _unitOfWork.FutureContract.GetFristAsync(f => f.Symbol == futureContracts[i].Symbol, cancellation);
+                if (contract == null)
+                {
+                    string[] parts = futureContracts[i].Symbol.Split('_');
+                    string asset = parts[0];
+                    string deliveryDate = parts[1];
+
+                    DateTime localDateTime = DateTime.ParseExact(deliveryDate, "ddMMyy", CultureInfo.InvariantCulture);
+                    DateTime utcDeliveryDate = localDateTime.Kind == DateTimeKind.Unspecified
+                        ? DateTime.SpecifyKind(localDateTime, DateTimeKind.Utc)
+                        : localDateTime.ToUniversalTime();
+
+                    contract = new FutureContract(futureContracts[i].Symbol, utcDeliveryDate, asset);
+                    await _unitOfWork.FutureContract.AddAsync(contract, cancellation);
+                    await _unitOfWork.SaveChangesAsync(cancellation);
+                }
+            }
+
+            var futureContract1Id = (await _unitOfWork.FutureContract.GetFristAsync(f => f.Symbol == futureContracts[0].Symbol, cancellation))!.Id;
+            var futureContract2Id = (await _unitOfWork.FutureContract.GetFristAsync(f => f.Symbol == futureContracts[1].Symbol, cancellation))!.Id;
+
+            while (currentTime <= arbitrageCalculatorDto.EndTime)
             {
                 try
                 {
-                    var price1Task = _binanceService.GetFuturesPrice(futures1Symbol, currentTime, interval);
-                    var price2Task = _binanceService.GetFuturesPrice(futures2Symbol, currentTime, interval);
+                    var price1Task = _binanceService.GetFuturesPrice(futureContracts[0].Symbol, currentTime, arbitrageCalculatorDto.Interval);
+                    var price2Task = _binanceService.GetFuturesPrice(futureContracts[1].Symbol, currentTime, arbitrageCalculatorDto.Interval);
 
                     await Task.WhenAll(price1Task, price2Task);
+
                     var price1 = price1Task.Result;
                     var price2 = price2Task.Result;
 
                     decimal currentPrice1 = price1?.Price ?? lastPrice1;
                     decimal currentPrice2 = price2?.Price ?? lastPrice2;
-                    if (price1 != null) lastPrice1 = currentPrice1;
-                    if (price2 != null) lastPrice2 = currentPrice2;
 
-                    _results.Add(new ArbitrageResult
-                    {
-                        Timestamp = currentTime,
-                        PriceF1 = currentPrice1,
-                        PriceF2 = currentPrice2,
-                        PriceDifference = currentPrice1 - currentPrice2
-                    });
+                    lastPrice1 = price1?.Price ?? lastPrice1;
+                    lastPrice2 = price2?.Price ?? lastPrice2;
+
+                    var arbitrageResult = new ArbitrageResult(
+                        currentTime,
+                        currentPrice1,
+                        currentPrice2,
+                        currentPrice1 - currentPrice2,
+                        futureContract1Id,
+                        futureContract2Id);
+
+                    await _unitOfWork.ArbitrageResult.AddAsync(arbitrageResult, cancellation);
+
+                    var futurePrice1 = new FuturePrice(price1?.Timestamp ?? DateTime.UtcNow, price1?.Price ?? currentPrice1, futureContract1Id);
+                    await _unitOfWork.FuturePrice.AddAsync(futurePrice1, cancellation);
+                    var futurePrice2 = new FuturePrice(price2?.Timestamp ?? DateTime.UtcNow, price2?.Price ?? currentPrice2, futureContract2Id);
+                    await _unitOfWork.FuturePrice.AddAsync(futurePrice2, cancellation);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error processing {currentTime}: {ex.Message}");
+                    _logger.Error($"Error => {nameof(ArbitrageCalculatorService)} error message => {ex.Message}");
+                    throw;
                 }
-                currentTime = currentTime.Add(interval);
+
+                currentTime = currentTime.Add(arbitrageCalculatorDto.Interval);
             }
-            return _results;
+            await _unitOfWork.SaveChangesAsync(cancellation);
         }
     }
-
 }

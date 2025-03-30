@@ -6,5 +6,6 @@ namespace FutureArbitrage.Application.Pipeline.Commands
     {
         public int StartTimeByDay { get; set; }
         public int IntervalByHours { get; set; }
+        public required string ContractType { get; set; } = "BTCUSDT"; // e.g. BTCUSDT
     }
 }

@@ -1,4 +1,5 @@
-﻿using FutureArbitrage.Infrastructure.Data.Configuration;
+﻿using FutureArbitrage.Domain.Entities;
+using FutureArbitrage.Infrastructure.Data.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -13,6 +14,10 @@ namespace FutureArbitrage.Infrastructure.Data.Context
         public FutureArbitrageDbContext()
         {
         }
+
+        public DbSet<ArbitrageResult> ArbitrageResults { get; set; }
+        public DbSet<FutureContract> FutureContracts { get; set; }
+        public DbSet<FuturePrice> FuturePrices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

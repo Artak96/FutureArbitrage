@@ -17,11 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Validators\" />
+    <ProjectReference Include="..\FutureArbitrage.Domain\FutureArbitrage.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FutureArbitrage.Domain\FutureArbitrage.Domain.csproj" />
+    <Folder Include="Pipeline\Queries\Handler\" />
   </ItemGroup>
 
 </Project>

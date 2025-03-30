@@ -1,12 +1,14 @@
-﻿using FutureArbitrage.Application.Services.Abstructions;
-using FutureArbitrage.Domain.Entities;
+﻿using FutureArbitrage.Application.Dtos;
+using FutureArbitrage.Application.Services.Abstructions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
 namespace FutureArbitrage.Infrastructure.Services.Implimentations
 {
     public class BinancePriceService : IBinancePriceService
     {
+        protected internal readonly ILogger _logger = Log.ForContext(typeof(BinancePriceService));
         private readonly HttpClient _httpClient;
         private const string BinanceApiBaseUrl = "https://fapi.binance.com/fapi/v1/klines";
         private const string ExchangeInfoUrl = "https://fapi.binance.com/fapi/v1/exchangeInfo";
@@ -15,54 +17,35 @@ namespace FutureArbitrage.Infrastructure.Services.Implimentations
         {
             _httpClient = new HttpClient();
         }
-        public async Task<(string symbol1, string symbol2)> GetLatestQuarterlyContracts()
+
+        public async Task<List<FuturesContractDto>> GetLatestQuarterlyContracts(string contructType)
         {
+            _logger.Information($"Start => {nameof(GetLatestQuarterlyContracts)}");
+
             var response = await _httpClient.GetStringAsync(ExchangeInfoUrl);
-            var exchangeInfo = JObject.Parse(response); // Parse the JSON response into a JObject
-
-            // Deserialize the "symbols" array directly to a list of FuturesContract
-            var symbols = exchangeInfo["symbols"]?
-                .ToObject<List<FuturesContract>>() ?? new List<FuturesContract>(); // Use safe navigation
-
-            // Filter BTCUSDT quarterly futures (excluding perpetual contracts)
+            var exchangeInfo = JObject.Parse(response);
+            var symbols = JsonConvert.DeserializeObject<List<FuturesContractDto>>(exchangeInfo["symbols"].ToString());
+      
             var quarterlyContracts = symbols
-                .Where(s => s.Symbol.StartsWith("BTCUSDT_") && s.Symbol.Length == 14) // YYMMDD format
+                .Where(s => s.Symbol.StartsWith($"{contructType}_") && s.Symbol.Length == 14) 
                 .OrderBy(s => s.DeliveryDate)
                 .ToList();
 
             if (quarterlyContracts.Count < 2)
                 throw new Exception("Not enough quarterly contracts available");
 
-            // Return the two nearest future contracts
-            return (quarterlyContracts[0].Symbol, quarterlyContracts[1].Symbol);
+            List<FuturesContractDto> futuresContracts = new List<FuturesContractDto>();
+            futuresContracts.AddRange(quarterlyContracts);
+
+            return futuresContracts;
         }
-        //public async Task<(string symbol1, string symbol2)> GetLatestQuarterlyContracts()
-        //{
-        //    var response = await _httpClient.GetStringAsync(ExchangeInfoUrl);
-        //    var exchangeInfo = JsonConvert.DeserializeObject<Dictionary<string, object>>(response);
-        //    var symbols = JsonConvert.DeserializeObject<List<FutureContract>>(exchangeInfo["symbols"].ToString());
-        //   // var exchangeInfo = JObject.Parse(response);
 
-        //   // Десериализуем символы фьючерсов
-        //   //var symbols = exchangeInfo["symbols"]?.ToObject<List<FuturesContract>>() ?? new List<FuturesContract>();
-
-
-        //    var quarterlyContracts = symbols
-        //        .Where(s => s.Symbol.StartsWith("BTCUSDT_") && s.Symbol.Length == 14)
-        //        .OrderBy(s => s.DeliveryDate)
-        //        .ToList();
-
-        //    if (quarterlyContracts.Count < 2)
-        //        throw new Exception("Not enough quarterly contracts available");
-
-        //    return (quarterlyContracts[0].Symbol, quarterlyContracts[1].Symbol);
-        //}
-
-        public async Task<FuturePrice?> GetFuturesPrice(string symbol, DateTime time, TimeSpan interval)
+        public async Task<FuturePriceDto?> GetFuturesPrice(string symbol, DateTime time, TimeSpan interval)
         {
-            string intervalStr = interval.TotalHours >= 48 ? "2d" : "1h";
+            _logger.Information($"Start => {nameof(GetFuturesPrice)}");
+
             long startTimeUnix = ((DateTimeOffset)time).ToUnixTimeMilliseconds();
-            string url = $"{BinanceApiBaseUrl}?symbol={symbol}&interval={intervalStr}&startTime={startTimeUnix}&limit=1";
+            string url = $"{BinanceApiBaseUrl}?symbol={symbol}&interval={interval.TotalHours+"h"}&startTime={startTimeUnix}&limit=1";
 
             try
             {
@@ -71,7 +54,7 @@ namespace FutureArbitrage.Infrastructure.Services.Implimentations
 
                 if (data.Length > 0)
                 {
-                    return new FuturePrice
+                    return new FuturePriceDto
                     {
                         Timestamp = time,
                         Price = decimal.Parse(data[0][4].ToString())
@@ -81,16 +64,9 @@ namespace FutureArbitrage.Infrastructure.Services.Implimentations
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to fetch price for {symbol} at {time}: {ex.Message}");
+                _logger.Error($"Error => {nameof(GetFuturesPrice)} exception message => {ex.Message}");
                 return null;
             }
         }
-    }
-    public class FuturesContract
-    {
-        [JsonProperty("symbol")]
-        public string Symbol { get; set; }  // Символ контракта (BTCUSDT_QUARTER, BTCUSDT_BI-QUARTER)
-        [JsonProperty("deliveryDate")]
-        public DateTime DeliveryDate { get; set; }  // Дата экспирации контракта
     }
 }

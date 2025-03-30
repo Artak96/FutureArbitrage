@@ -1,9 +1,9 @@
-﻿using FutureArbitrage.Domain.Entities;
+﻿using FutureArbitrage.Application.Dtos;
 
 namespace FutureArbitrage.Application.Services.Abstructions
 {
     public interface IArbitrageCalculatorService
     {
-        Task<List<ArbitrageResult>> CalculateArbitrage(TimeSpan interval, DateTime startTime, DateTime endTime);
+        Task CalculateArbitrage(ArbitrageCalculatorDto arbitrageCalculatorDto, CancellationToken cancellation);
     }
 }

@@ -3,6 +3,7 @@ using System;
 using FutureArbitrage.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FutureArbitrage.Infrastructure.Migrations
 {
     [DbContext(typeof(FutureArbitrageDbContext))]
-    partial class FutureArbitrageDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250330133515_initialsda")]
+    partial class initialsda
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,7 +63,7 @@ namespace FutureArbitrage.Infrastructure.Migrations
 
                     b.HasIndex("FuturesContract2Id");
 
-                    b.ToTable("ArbitrageResults", (string)null);
+                    b.ToTable("ArbitrageResult");
                 });
 
             modelBuilder.Entity("FutureArbitrage.Domain.Entities.FutureContract", b =>
@@ -92,7 +95,7 @@ namespace FutureArbitrage.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FutureContracts", (string)null);
+                    b.ToTable("FutureContract");
                 });
 
             modelBuilder.Entity("FutureArbitrage.Domain.Entities.FuturePrice", b =>
@@ -124,7 +127,7 @@ namespace FutureArbitrage.Infrastructure.Migrations
 
                     b.HasIndex("FutureContractId");
 
-                    b.ToTable("FuturePrices", (string)null);
+                    b.ToTable("FuturePrice");
                 });
 
             modelBuilder.Entity("FutureArbitrage.Domain.Entities.ArbitrageResult", b =>

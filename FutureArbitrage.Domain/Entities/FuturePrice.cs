@@ -5,8 +5,8 @@ namespace FutureArbitrage.Domain.Entities
     public class FuturePrice : Entity
     {
         public long Id { get; set; }
-        public DateTime Timestamp { get; set; } // Временная метка
-        public decimal Price { get; set; } // Цена закрытия
+        public decimal Price { get; set; } 
+        public DateTime Timestamp { get; set; } 
 
         public long FutureContractId { get; set; } 
         public virtual FutureContract FuturesContract { get; set; }

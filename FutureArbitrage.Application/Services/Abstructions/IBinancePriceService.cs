@@ -1,10 +1,10 @@
-﻿using FutureArbitrage.Domain.Entities;
+﻿using FutureArbitrage.Application.Dtos;
 
 namespace FutureArbitrage.Application.Services.Abstructions
 {
     public interface IBinancePriceService
     {
-        Task<(string symbol1, string symbol2)> GetLatestQuarterlyContracts();
-        Task<FuturePrice?> GetFuturesPrice(string symbol, DateTime time, TimeSpan interval);
+        Task<List<FuturesContractDto>> GetLatestQuarterlyContracts(string contructType);
+        Task<FuturePriceDto?> GetFuturesPrice(string symbol, DateTime time, TimeSpan interval);
     }
 }

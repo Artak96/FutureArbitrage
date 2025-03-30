@@ -8,22 +8,34 @@ namespace FutureArbitrage.Infrastructure.Data.Configuration
     {
         public void Configure(EntityTypeBuilder<ArbitrageResult> builder)
         {
-            builder.HasKey(ar => ar.Id); // Set Id as primary key
-            builder.Property(ar => ar.Id); // Auto-generate GUID
-            builder.Property(ar => ar.Timestamp).IsRequired(); // Timestamp is required
-            builder.Property(ar => ar.PriceF1).HasColumnType("decimal(18, 2)").IsRequired(); // PriceF1 as decimal
-            builder.Property(ar => ar.PriceF2).HasColumnType("decimal(18, 2)").IsRequired(); // PriceF2 as decimal
-            builder.Property(ar => ar.PriceDifference).HasColumnType("decimal(18, 2)").IsRequired(); // PriceDifference as decimal
+            builder.ToTable("ArbitrageResults");
+            builder.HasKey(ar => ar.Id); 
+            builder.Property(ar => ar.Id); 
+           
+            builder.Property(ar => ar.Timestamp)
+                .IsRequired(); 
+          
+            builder.Property(ar => ar.PriceF1)
+                .HasColumnType("decimal(18, 2)")
+                .IsRequired(); 
+           
+            builder.Property(ar => ar.PriceF2)
+                .HasColumnType("decimal(18, 2)")
+                .IsRequired(); 
+           
+            builder.Property(ar => ar.PriceDifference)
+                .HasColumnType("decimal(18, 2)")
+                .IsRequired(); 
 
             builder.HasOne(ar => ar.FuturesContract1)
                 .WithMany(fc => fc.ArbitrageResultsAsContract1)
                 .HasForeignKey(ar => ar.FuturesContract1Id)
-                .OnDelete(DeleteBehavior.Restrict); // Set FK for FuturesContract1
+                .OnDelete(DeleteBehavior.Restrict); 
 
             builder.HasOne(ar => ar.FuturesContract2)
                 .WithMany()
                 .HasForeignKey(ar => ar.FuturesContract2Id)
-                .OnDelete(DeleteBehavior.Restrict); // Set FK for FuturesContract2
+                .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 }

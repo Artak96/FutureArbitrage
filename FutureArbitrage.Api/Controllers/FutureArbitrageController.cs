@@ -24,7 +24,6 @@ namespace FutureArbitrage.Api.Controllers
                 _logger.Information($"Start execute => {nameof(FutureArbitrageController)}/{nameof(QuarterlyContractArbitrage)}");
                 await _mediator.Send(command);
                 return Ok();
-
             }
             catch (Exception ex)
             {
