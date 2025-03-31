@@ -17,6 +17,8 @@ namespace FutureArbitrage.Application
 
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddAutoMapper(Assembly.GetAssembly(typeof(AssemblyReference)));
+
             services.AddScoped<IArbitrageCalculatorService, ArbitrageCalculatorService>();
 
             services.AddMediatR();

@@ -18,18 +18,26 @@ namespace FutureArbitrage.Application.Pipeline.Commands.Handlers
 
         public async Task Handle(QuarterlyContractArbitrageCommand request, CancellationToken cancellationToken)
         {
-            _logger.Information($"Start => {nameof(QuarterlyContractArbitrageCommandHandler)} => request {System.Text.Json.JsonSerializer.Serialize(request)}");
-
-            var arbitageCalculator = new ArbitrageCalculatorDto
+            try
             {
-                ContractType = request.ContractType,
-                EndTime = DateTime.UtcNow,
-                Interval = TimeSpan.FromHours(request.IntervalByHours),
-                StartTime = DateTime.UtcNow.AddDays(-request.StartTimeByDay)
-            };
-            await _arbitreageCalculator.CalculateArbitrage(arbitageCalculator, cancellationToken);
+                _logger.Information($"Start => {nameof(QuarterlyContractArbitrageCommandHandler)} => request {System.Text.Json.JsonSerializer.Serialize(request)}");
+                await _arbitreageCalculator.SetExchange(request.ExchangeType);
+                var arbitageCalculator = new ArbitrageCalculatorDto
+                {
+                    Asset = request.Asset,
+                    EndTime = DateTime.UtcNow,
+                    Interval = TimeSpan.FromHours(request.IntervalByHours),
+                    StartTime = DateTime.UtcNow.AddDays(-request.StartTimeByDay)
+                };
+                await _arbitreageCalculator.CalculateArbitrage(arbitageCalculator, cancellationToken);
 
-            _logger.Information($"End => {nameof(QuarterlyContractArbitrageCommandHandler)}");
+                _logger.Information($"End => {nameof(QuarterlyContractArbitrageCommandHandler)}");
+            }
+            catch (Exception ex)
+            {
+                _logger.Information($"Error => {nameof(QuarterlyContractArbitrageCommandHandler)}, exception message => {ex.Message}");
+                throw;
+            }
         }
     }
 }

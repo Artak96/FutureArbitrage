@@ -2,6 +2,7 @@
 using FutureArbitrage.Application.Services.Abstructions;
 using FutureArbitrage.Domain.Abstractions;
 using FutureArbitrage.Domain.Entities;
+using FutureArbitrage.Domain.Enums;
 using Serilog;
 using System.Globalization;
 
@@ -10,21 +11,34 @@ namespace FutureArbitrage.Application.Services.Implimentations
     public class ArbitrageCalculatorService : IArbitrageCalculatorService
     {
         protected internal readonly ILogger _logger = Log.ForContext(typeof(ArbitrageCalculatorService));
-        private readonly IBinancePriceService _binanceService;
+        private readonly IPriceServiceContextStrategy _priceServiceContext;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IExchangePriceServiceFactory _factory; 
+        private readonly HttpClient _httpClient;
 
-        public ArbitrageCalculatorService(IBinancePriceService binanceService, IUnitOfWork unitOfWork)
+        public ArbitrageCalculatorService(
+            IPriceServiceContextStrategy priceServiceContext,
+            IUnitOfWork unitOfWork,
+            IExchangePriceServiceFactory factory,
+            HttpClient httpClient)
         {
-            _binanceService = binanceService;
+            _priceServiceContext = priceServiceContext;
             _unitOfWork = unitOfWork;
+            _factory = factory;
+            _httpClient = httpClient;
+        }
+
+        public async Task SetExchange(ExchangeTypeEnum exchangeType)
+        {
+            var newService = _factory.CreatePriceService(exchangeType);
+            _priceServiceContext.SetPriceService(newService);
         }
 
         public async Task CalculateArbitrage(ArbitrageCalculatorDto arbitrageCalculatorDto, CancellationToken cancellation)
         {
-
             _logger.Information($"Start => {nameof(ArbitrageCalculatorService)}");
 
-            var futureContracts = await _binanceService.GetLatestQuarterlyContracts(arbitrageCalculatorDto.ContractType);
+            var futureContracts = await _priceServiceContext.GetLatestQuarterlyContracts(arbitrageCalculatorDto.Asset);
             DateTime currentTime = arbitrageCalculatorDto.StartTime;
             decimal lastPrice1 = 0m;
             decimal lastPrice2 = 0m;
@@ -56,8 +70,8 @@ namespace FutureArbitrage.Application.Services.Implimentations
             {
                 try
                 {
-                    var price1Task = _binanceService.GetFuturesPrice(futureContracts[0].Symbol, currentTime, arbitrageCalculatorDto.Interval);
-                    var price2Task = _binanceService.GetFuturesPrice(futureContracts[1].Symbol, currentTime, arbitrageCalculatorDto.Interval);
+                    var price1Task = _priceServiceContext.GetFuturesPrice(futureContracts[0].Symbol, currentTime, arbitrageCalculatorDto.Interval);
+                    var price2Task = _priceServiceContext.GetFuturesPrice(futureContracts[1].Symbol, currentTime, arbitrageCalculatorDto.Interval);
 
                     await Task.WhenAll(price1Task, price2Task);
 
@@ -94,6 +108,8 @@ namespace FutureArbitrage.Application.Services.Implimentations
                 currentTime = currentTime.Add(arbitrageCalculatorDto.Interval);
             }
             await _unitOfWork.SaveChangesAsync(cancellation);
+            
+            _logger.Information($"End => {nameof(ArbitrageCalculatorService)}");
         }
     }
 }

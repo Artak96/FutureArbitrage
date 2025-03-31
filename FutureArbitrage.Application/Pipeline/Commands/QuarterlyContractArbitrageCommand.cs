@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FutureArbitrage.Domain.Enums;
+using MediatR;
 
 namespace FutureArbitrage.Application.Pipeline.Commands
 {
@@ -6,6 +7,7 @@ namespace FutureArbitrage.Application.Pipeline.Commands
     {
         public int StartTimeByDay { get; set; }
         public int IntervalByHours { get; set; }
-        public required string ContractType { get; set; } = "BTCUSDT"; // e.g. BTCUSDT
+        public required string Asset { get; set; } = "BTCUSDT"; // e.g. BTCUSDT
+        public ExchangeTypeEnum ExchangeType { get; set; }
     }
 }

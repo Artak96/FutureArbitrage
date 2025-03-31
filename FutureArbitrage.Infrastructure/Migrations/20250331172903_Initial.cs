@@ -7,96 +7,96 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FutureArbitrage.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "FutureContract",
+                name: "FutureContracts",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Symbol = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    DeliveryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Asset = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    DeliveryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FutureContract", x => x.Id);
+                    table.PrimaryKey("PK_FutureContracts", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ArbitrageResult",
+                name: "ArbitrageResults",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     PriceF1 = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     PriceF2 = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     PriceDifference = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     FuturesContract1Id = table.Column<long>(type: "bigint", nullable: false),
                     FuturesContract2Id = table.Column<long>(type: "bigint", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArbitrageResult", x => x.Id);
+                    table.PrimaryKey("PK_ArbitrageResults", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ArbitrageResult_FutureContract_FuturesContract1Id",
+                        name: "FK_ArbitrageResults_FutureContracts_FuturesContract1Id",
                         column: x => x.FuturesContract1Id,
-                        principalTable: "FutureContract",
+                        principalTable: "FutureContracts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ArbitrageResult_FutureContract_FuturesContract2Id",
+                        name: "FK_ArbitrageResults_FutureContracts_FuturesContract2Id",
                         column: x => x.FuturesContract2Id,
-                        principalTable: "FutureContract",
+                        principalTable: "FutureContracts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "FuturePrice",
+                name: "FuturePrices",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     FutureContractId = table.Column<long>(type: "bigint", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FuturePrice", x => x.Id);
+                    table.PrimaryKey("PK_FuturePrices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FuturePrice_FutureContract_FutureContractId",
+                        name: "FK_FuturePrices_FutureContracts_FutureContractId",
                         column: x => x.FutureContractId,
-                        principalTable: "FutureContract",
+                        principalTable: "FutureContracts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArbitrageResult_FuturesContract1Id",
-                table: "ArbitrageResult",
+                name: "IX_ArbitrageResults_FuturesContract1Id",
+                table: "ArbitrageResults",
                 column: "FuturesContract1Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArbitrageResult_FuturesContract2Id",
-                table: "ArbitrageResult",
+                name: "IX_ArbitrageResults_FuturesContract2Id",
+                table: "ArbitrageResults",
                 column: "FuturesContract2Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FuturePrice_FutureContractId",
-                table: "FuturePrice",
+                name: "IX_FuturePrices_FutureContractId",
+                table: "FuturePrices",
                 column: "FutureContractId");
         }
 
@@ -104,13 +104,13 @@ namespace FutureArbitrage.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ArbitrageResult");
+                name: "ArbitrageResults");
 
             migrationBuilder.DropTable(
-                name: "FuturePrice");
+                name: "FuturePrices");
 
             migrationBuilder.DropTable(
-                name: "FutureContract");
+                name: "FutureContracts");
         }
     }
 }

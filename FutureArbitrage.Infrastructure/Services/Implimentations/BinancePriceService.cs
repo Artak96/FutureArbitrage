@@ -6,19 +6,19 @@ using Serilog;
 
 namespace FutureArbitrage.Infrastructure.Services.Implimentations
 {
-    public class BinancePriceService : IBinancePriceService
+    public class BinancePriceService : IExchangePriceServiceStrategy
     {
         protected internal readonly ILogger _logger = Log.ForContext(typeof(BinancePriceService));
         private readonly HttpClient _httpClient;
         private const string BinanceApiBaseUrl = "https://fapi.binance.com/fapi/v1/klines";
         private const string ExchangeInfoUrl = "https://fapi.binance.com/fapi/v1/exchangeInfo";
 
-        public BinancePriceService()
+        public BinancePriceService(HttpClient httpClient)
         {
-            _httpClient = new HttpClient();
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task<List<FuturesContractDto>> GetLatestQuarterlyContracts(string contructType)
+        public async Task<List<FuturesContractDto>> GetLatestQuarterlyContracts(string asset)
         {
             _logger.Information($"Start => {nameof(GetLatestQuarterlyContracts)}");
 
@@ -27,7 +27,7 @@ namespace FutureArbitrage.Infrastructure.Services.Implimentations
             var symbols = JsonConvert.DeserializeObject<List<FuturesContractDto>>(exchangeInfo["symbols"].ToString());
       
             var quarterlyContracts = symbols
-                .Where(s => s.Symbol.StartsWith($"{contructType}_") && s.Symbol.Length == 14) 
+                .Where(s => s.Symbol.StartsWith($"{asset}_") && s.Symbol.Length == 14) 
                 .OrderBy(s => s.DeliveryDate)
                 .ToList();
 

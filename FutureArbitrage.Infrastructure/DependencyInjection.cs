@@ -5,6 +5,7 @@ using FutureArbitrage.Domain.Common;
 using FutureArbitrage.Infrastructure.Data.Context;
 using FutureArbitrage.Infrastructure.Implimentations;
 using FutureArbitrage.Infrastructure.Implimentations.Repositories;
+using FutureArbitrage.Infrastructure.Services;
 using FutureArbitrage.Infrastructure.Services.Implimentations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +25,18 @@ namespace FutureArbitrage.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWOrk>();
 
             // Registr Services
-            services.AddScoped<IBinancePriceService, BinancePriceService>();
+            services.AddHttpClient();
+            services.AddScoped<IExchangePriceServiceFactory, ExchangePriceServiceFactory>();
+            services.AddScoped<IPriceServiceContextStrategy, PriceServiceContextStrategy>();
+            services.AddScoped<IExchangePriceServiceStrategy, BinancePriceService>();
+
+            //services.AddScoped<IPriceServiceContextStrategy>(serviceProvider =>
+            //{
+            //    var factory = serviceProvider.GetRequiredService<IExchangePriceServiceFactory>(); 
+            //    var defaultExchange = ExchangeTypeEnum.Binance;
+            //    var defaultService = factory.CreatePriceService(defaultExchange);
+            //    return new PriceServiceContextStrategy(defaultService);
+            //});
 
             string connectionString = configuration.GetConnectionString("ConnectionString")!;
             services.AddDbContext<FutureArbitrageDbContext>(options =>

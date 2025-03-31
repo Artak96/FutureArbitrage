@@ -7,10 +7,15 @@ namespace FutureArbitrage.Application.Validators
     {
         public QuarterlyContractArbitrageCommandValidator()
         {
-            RuleFor(x => x.ContractType)
+            RuleFor(x => x.Asset)
                .NotEmpty()
                .NotNull()
-               .WithMessage("ContractType is required.");
+               .WithMessage("Asset is required.");
+
+            RuleFor(x => x.ExchangeType)
+                .NotEmpty()
+                .NotNull()
+                .WithMessage("Asset is required.");
 
             RuleFor(x => x.IntervalByHours)
                .GreaterThan(0)

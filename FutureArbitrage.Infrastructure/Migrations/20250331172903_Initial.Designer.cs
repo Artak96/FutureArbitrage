@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FutureArbitrage.Infrastructure.Migrations
 {
     [DbContext(typeof(FutureArbitrageDbContext))]
-    [Migration("20250330133452_initialsd")]
-    partial class initialsd
+    [Migration("20250331172903_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,7 +63,7 @@ namespace FutureArbitrage.Infrastructure.Migrations
 
                     b.HasIndex("FuturesContract2Id");
 
-                    b.ToTable("ArbitrageResult");
+                    b.ToTable("ArbitrageResults", (string)null);
                 });
 
             modelBuilder.Entity("FutureArbitrage.Domain.Entities.FutureContract", b =>
@@ -76,7 +76,8 @@ namespace FutureArbitrage.Infrastructure.Migrations
 
                     b.Property<string>("Asset")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -94,7 +95,7 @@ namespace FutureArbitrage.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FutureContract");
+                    b.ToTable("FutureContracts", (string)null);
                 });
 
             modelBuilder.Entity("FutureArbitrage.Domain.Entities.FuturePrice", b =>
@@ -126,7 +127,7 @@ namespace FutureArbitrage.Infrastructure.Migrations
 
                     b.HasIndex("FutureContractId");
 
-                    b.ToTable("FuturePrice");
+                    b.ToTable("FuturePrices", (string)null);
                 });
 
             modelBuilder.Entity("FutureArbitrage.Domain.Entities.ArbitrageResult", b =>
