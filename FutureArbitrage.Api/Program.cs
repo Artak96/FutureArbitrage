@@ -1,5 +1,8 @@
 using FutureArbitrage.Application;
 using FutureArbitrage.Infrastructure;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +26,24 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("FutureArbitrage"))
+    .WithMetrics(metrics =>
+    {
+        metrics
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation();
+        metrics.AddOtlpExporter();
+    })
+    .WithTracing(tracing =>
+    {
+        tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddEntityFrameworkCoreInstrumentation();
+        tracing.AddOtlpExporter();
+    });
 
 var app = builder.Build();
 
