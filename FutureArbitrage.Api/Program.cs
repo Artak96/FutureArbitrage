@@ -1,5 +1,6 @@
 using FutureArbitrage.Application;
 using FutureArbitrage.Infrastructure;
+using FutureArbitrage.Infrastructure.Data.Context;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -35,6 +36,7 @@ builder.Services.AddOpenTelemetry()
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation();
         metrics.AddOtlpExporter();
+        //option => option.Endpoint = new Uri("http://futurearbitrage.dashboard:18889")
     })
     .WithTracing(tracing =>
     {
@@ -53,6 +55,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//app.MapPost("arbitrage", (FutureArbitrageDbContext dbContext, ILogger<Program> logger) => {
+//    var entry = dbContext.ArbitrageResults
+//});
 
 app.UseHttpsRedirection();
 
