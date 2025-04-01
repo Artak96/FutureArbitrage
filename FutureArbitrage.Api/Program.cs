@@ -1,12 +1,15 @@
 using FutureArbitrage.Application;
 using FutureArbitrage.Infrastructure;
 using FutureArbitrage.Infrastructure.Data.Context;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 // Add services to the container.
 
@@ -28,26 +31,30 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddOpenTelemetry()
-    .ConfigureResource(resource => resource.AddService("FutureArbitrage"))
-    .WithMetrics(metrics =>
-    {
-        metrics
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation();
-        metrics.AddOtlpExporter();
-        //option => option.Endpoint = new Uri("http://futurearbitrage.dashboard:18889")
-    })
-    .WithTracing(tracing =>
-    {
-        tracing
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddEntityFrameworkCoreInstrumentation();
-        tracing.AddOtlpExporter();
-    });
+//builder.Services.AddOpenTelemetry()
+//    .ConfigureResource(resource => resource.AddService("FutureArbitrage"))
+//    .WithMetrics(metrics =>
+//    {
+//        metrics
+//        .AddAspNetCoreInstrumentation()
+//        .AddHttpClientInstrumentation();
+//        metrics.AddOtlpExporter();
+//        //option => option.Endpoint = new Uri("http://futurearbitrage.dashboard:18889")
+//    })
+//    .WithTracing(tracing =>
+//    {
+//        tracing
+//        .AddAspNetCoreInstrumentation()
+//        .AddHttpClientInstrumentation()
+//        .AddEntityFrameworkCoreInstrumentation();
+//        tracing.AddOtlpExporter();
+//    });
+
+//builder.Logging.AddOpenTelemetry(logging => logging.AddOtlpExporter());
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
