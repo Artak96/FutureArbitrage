@@ -11,6 +11,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureArbitrage.Domain", "F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureArbitrage.Infrastructure", "FutureArbitrage.Infrastructure\FutureArbitrage.Infrastructure.csproj", "{5A9C0F52-556C-4AE0-8E25-C951B38DA03C}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{4698E1A6-AE90-4B73-B74A-7A2FAA11DA62}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureArbitrage.AppHost", "FutureArbitrage.AppHost\FutureArbitrage.AppHost.csproj", "{AFDB6BED-3799-4E25-8A37-A63D6A0D53B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureArbitrage.ServiceDefaults", "FutureArbitrage.ServiceDefaults\FutureArbitrage.ServiceDefaults.csproj", "{6831178E-FF88-0D94-33C0-E336B1150D62}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspire", "aspire", "{F49BBDCA-3C4C-4850-9221-166D6D5AAC76}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +43,29 @@ Global
 		{5A9C0F52-556C-4AE0-8E25-C951B38DA03C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A9C0F52-556C-4AE0-8E25-C951B38DA03C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A9C0F52-556C-4AE0-8E25-C951B38DA03C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4698E1A6-AE90-4B73-B74A-7A2FAA11DA62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4698E1A6-AE90-4B73-B74A-7A2FAA11DA62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4698E1A6-AE90-4B73-B74A-7A2FAA11DA62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4698E1A6-AE90-4B73-B74A-7A2FAA11DA62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFDB6BED-3799-4E25-8A37-A63D6A0D53B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFDB6BED-3799-4E25-8A37-A63D6A0D53B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFDB6BED-3799-4E25-8A37-A63D6A0D53B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFDB6BED-3799-4E25-8A37-A63D6A0D53B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6831178E-FF88-0D94-33C0-E336B1150D62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6831178E-FF88-0D94-33C0-E336B1150D62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6831178E-FF88-0D94-33C0-E336B1150D62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6831178E-FF88-0D94-33C0-E336B1150D62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1CF6184E-681A-4748-8F3B-6C4D132BFA60} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{E3D59C7A-ACBC-4EB5-85CE-74E5F829EB64} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{EFA7FFFE-B082-4686-B83C-636C6A1B288D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{5A9C0F52-556C-4AE0-8E25-C951B38DA03C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{AFDB6BED-3799-4E25-8A37-A63D6A0D53B2} = {F49BBDCA-3C4C-4850-9221-166D6D5AAC76}
+		{6831178E-FF88-0D94-33C0-E336B1150D62} = {F49BBDCA-3C4C-4850-9221-166D6D5AAC76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D92DD474-B3B0-48B4-BDDD-6210C0F02DE6}
